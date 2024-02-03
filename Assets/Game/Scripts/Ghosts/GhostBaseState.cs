@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,28 +11,30 @@ public class GhostBaseState : FSMBaseState
     public string GoToDieStateName = "Die";
     public string GoToReturnStateName = "ReturnToBase";
     public string GoToRespawnStateName = "Respawn";
+    public float boundXRight = 8.0f;
+    public float boundXLeft = -8.0f;
+    public float boundYUp = 9.0f;
+    public float boundYDown = -9.0f;
+    protected bool ClydeChase = false;
     protected GhostController controller;
-    //protected GameDirector director;
     protected float roundCounter = 1;
-
-    /*private void OnDestroy()
-    {
-        GameDirector.Instance.GameStateChanged.RemoveListener(StateChanged);
-        controller.pathCompletedEvent.RemoveListener(PathCompleted);
-        controller.killedEvent.RemoveListener(Killed);
-    }*/
+    protected float totalTime = 0;
 
     public override void Init(GameObject _owner, FSM _fsm)
     {
-        //director = GameDirector.Instance;
         base.Init(_owner, _fsm);
-
         controller = _owner.GetComponent<GhostController>();
-
-        //GameDirector.Instance.GameStateChanged.AddListener(StateChanged);
-        //controller.pathCompletedEvent.AddListener(PathCompleted);
-        //controller.killedEvent.AddListener(Killed);
         Debug.Assert(controller != null, $"{_owner.name} must have a GhostController Component");
+    }
+
+    public bool distanceFromPacman()
+    {
+        //8 tiles, true if not close enough, false if far
+        float difx = controller.PacMan.position.x - controller.position.x;
+        float dify = controller.PacMan.position.y - controller.position.y;
+        float hyp = (float)Math.Sqrt(dify * dify + difx * difx);
+        if (hyp < 8) { return true; }
+        return false;
     }
 
     public virtual void StateChanged(GameDirector.States _state)

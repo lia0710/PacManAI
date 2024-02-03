@@ -4,11 +4,14 @@ using UnityEngine;
 
 public class InkyChaseState : GhostBaseState
 {
-    float totalTime = 0;
+    //float totalTime = 0;
     float currentTime = 0;
+    public float changeTimer = 1;
+    float currentChangeTime = 0;
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameDirector.Instance.GameStateChanged.AddListener(StateChanged);
+        controller.pathCompletedEvent.AddListener(PathCompleted);
         Debug.Log("Chase State Enter");
         switch (roundCounter)
         {
@@ -21,6 +24,7 @@ public class InkyChaseState : GhostBaseState
             case 4:
                 totalTime = 999; break;
         }
+        controller.SetMoveToLocation(CalculateTarget());
     }
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
@@ -33,6 +37,11 @@ public class InkyChaseState : GhostBaseState
             roundCounter += 1;
             currentTime = 0;
             fsm.ChangeState(GoToSpreadStateName);
+        }
+        if (currentChangeTime > changeTimer)
+        {
+            controller.SetMoveToLocation(CalculateTarget());
+            currentChangeTime = 0;
         }
     }
 
@@ -49,5 +58,46 @@ public class InkyChaseState : GhostBaseState
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
         GameDirector.Instance.GameStateChanged.RemoveListener(StateChanged);
+        controller.pathCompletedEvent.RemoveListener(PathCompleted);
+    }
+
+    override public void PathCompleted()
+    {
+        controller.SetMoveToLocation(CalculateTarget());
+    }
+
+    private Vector2 CalculateTarget()
+    {
+        Vector2 target = new Vector2(controller.PacMan.position.x, controller.PacMan.position.y);
+        switch (GameDirector.Instance.pacmanController.moveDirection)
+        {
+            case PacmanController.MoveDirection.Left:
+                target.x -= 2; break;
+            case PacmanController.MoveDirection.Right:
+                target.x += 2; break;
+            case PacmanController.MoveDirection.Up:
+                target.y += 2; break;
+            case PacmanController.MoveDirection.Down:
+                target.y -= 2; break;
+        }
+        Debug.Log("X: " + target.x + " Y: " + target.y);
+        GameObject blinky = GameObject.Find("Blinky");
+        if(blinky != null ) 
+        { 
+            float difx = target.x - blinky.transform.position.x;
+            float dify = target.y - blinky.transform.position.y;
+            difx *= 2;
+            dify *= 2;
+            target.x = blinky.transform.position.x + difx;
+            target.y = blinky.transform.position.y + dify;
+        }
+        if (target.x < boundXLeft) { target.x = boundXLeft; }
+        if (target.x > boundXRight) { target.x = boundXRight; }
+        if (target.y > boundYUp) { target.y = boundYUp; }
+        if (target.y < boundYDown) { target.y = boundYDown; }
+        target.x = Mathf.Round(target.x);
+        target.y = Mathf.Round(target.y);
+        Debug.Log("X: " + target.x + " Y: " + target.y);
+        return target;
     }
 }

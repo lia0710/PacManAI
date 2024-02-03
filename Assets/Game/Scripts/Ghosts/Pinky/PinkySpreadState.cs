@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PinkySpreadState : GhostBaseState
 {
-    protected float totalTime = 0;
+    //protected float totalTime = 0;
     protected float currentTime = 0;
     protected List<Vector2> pointsList = new List<Vector2>();
     protected Vector2 loc1 = new Vector2(8, 9);

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class ClydeChaseState : GhostBaseState
 {
-    float totalTime = 0;
+    //float totalTime = 0;
     float currentTime = 0;
     public float changeTimer = 1;
     float currentChangeTime = 0;
@@ -15,34 +15,41 @@ public class ClydeChaseState : GhostBaseState
         GameDirector.Instance.GameStateChanged.AddListener(StateChanged);
         controller.pathCompletedEvent.AddListener(PathCompleted);
         Debug.Log("Chase State Enter");
-        switch (roundCounter)
+        if (!ClydeChase)
         {
-            case 1:
-                totalTime = 20; break;
-            case 2:
-                totalTime = 20; break;
-            case 3:
-                totalTime = 20; break;
-            case 4:
-                totalTime = 999; break;
+            switch (roundCounter)
+            {
+                case 1:
+                    totalTime = 20; break;
+                case 2:
+                    totalTime = 20; break;
+                case 3:
+                    totalTime = 20; break;
+                case 4:
+                    totalTime = 999; break;
+            }
         }
+        ClydeChase = true;
         closeEnough = distanceFromPacman(); 
-        if (closeEnough) { }
+        if (closeEnough)
+        {
+            fsm.ChangeState(GoToSpreadStateName);
+        }
         else
         {
             controller.SetMoveToLocation(new Vector2(controller.PacMan.position.x, controller.PacMan.position.y));
         }
+
     }
 
     override public void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        //Debug.Log("Clyde is in Chase State");
-
         currentTime += Time.deltaTime;
         if ((currentTime) >= totalTime && (roundCounter < 4))
         {
             roundCounter += 1;
             currentTime = 0;
+            ClydeChase = false;
             fsm.ChangeState(GoToSpreadStateName);
         }
         if (currentChangeTime > changeTimer)
@@ -59,7 +66,6 @@ public class ClydeChaseState : GhostBaseState
 
     override public void StateChanged(GameDirector.States _state)
     {
-        //Debug.Log("state change");
         switch (_state)
         {
             case GameDirector.States.enState_PacmanInvincible:
@@ -76,20 +82,10 @@ public class ClydeChaseState : GhostBaseState
     override public void PathCompleted()
     {
         closeEnough = distanceFromPacman();
-        if(closeEnough) { }
+        if(closeEnough) { fsm.ChangeState(GoToSpreadStateName); }
         else 
         {
             controller.SetMoveToLocation(new Vector2(controller.PacMan.position.x, controller.PacMan.position.y));
         }
-    }
-
-    public bool distanceFromPacman()
-    { 
-        //8 tiles, true if not close enough, false if far
-        float difx = controller.PacMan.position.x - controller.position.x;
-        float dify = controller.PacMan.position.y - controller.position.y;
-        float hyp = (float)Math.Sqrt(dify * dify + difx * difx);
-        if (hyp < 8) { return true; }
-        return false;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BlinkyChaseState : GhostBaseState
 {
-    float totalTime = 0;
+    //float totalTime = 0;
     float currentTime = 0;
     public float changeTimer = 1;
     float currentChangeTime = 0;
