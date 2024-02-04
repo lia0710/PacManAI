@@ -28,11 +28,14 @@ public class GhostController : MonoBehaviour
 	public bool isDead = false;
 	public Vector3 position;
 
-	void Start()
+    public List<Vector2> intersections = new List<Vector2>();
+
+    void Start()
 	{
 		_animator = GetComponent<Animator>();
 		GameDirector.Instance.GameStateChanged.AddListener(GameStateChanged);
-	}
+		intersections = Intersections.Instance.intersections;
+    }
 
     private void OnDestroy()
     {

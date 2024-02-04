@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class ClydeFleeState : GhostBaseState
+public class GhostFleeState : GhostBaseState
 {
+
     private Vector2 currentPosition = new Vector2();
     private Vector2 lastPosition = new Vector2();
     private string direction = "Up";
@@ -26,10 +27,10 @@ public class ClydeFleeState : GhostBaseState
     {
         currentPosition.x = controller.position.x;
         currentPosition.y = controller.position.y;
-        if(currentPosition.x < lastPosition.x) { direction = "Left"; }
-        if(currentPosition.x > lastPosition.x) { direction = "Right"; }
-        if(currentPosition.y < lastPosition.y) { direction = "Down"; }
-        if(currentPosition.y > lastPosition.y) { direction = "Up"; }
+        if (currentPosition.x < lastPosition.x) { direction = "Left"; }
+        if (currentPosition.x > lastPosition.x) { direction = "Right"; }
+        if (currentPosition.y < lastPosition.y) { direction = "Down"; }
+        if (currentPosition.y > lastPosition.y) { direction = "Up"; }
     }
 
     override public void Killed()
